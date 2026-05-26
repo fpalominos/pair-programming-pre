@@ -1,0 +1,25 @@
+Exercise 1 — Trade Validation Pipeline
+
+This is the foundational one.
+
+Problem
+
+Model and validate trades.
+
+A trade has:
+
+id
+symbol
+quantity
+price
+
+Validation rules:
+
+quantity > 0
+price > 0
+symbol non-empty
+
+Return either:
+
+valid trade
+validation errors
