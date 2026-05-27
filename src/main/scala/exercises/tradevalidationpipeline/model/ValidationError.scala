@@ -5,3 +5,4 @@ trait ValidationError
 case object InvalidQuantity extends ValidationError
 case object InvalidPrice extends ValidationError
 case object EmptySymbol extends ValidationError
+final case class ReferenceDataLookupFailed(reason: String) extends ValidationError

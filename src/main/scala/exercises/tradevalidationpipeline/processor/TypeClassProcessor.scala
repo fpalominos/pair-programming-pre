@@ -9,3 +9,13 @@ class TypeClassProcessor(implicit validator: ValidatorI[ValidationError, Trade])
     trades.map(t => validator.validate(t))
   }
 }
+
+/***
+ * apply usage. Handy if you don't want to use new all the time
+ * object TypeClassProcessor {
+ * def apply()(implicit validator: ValidatorI[ValidationError, Trade]): TypeClassProcessor =
+ * new TypeClassProcessor()
+ * }
+ *
+ * usage: TypeClassProcessor() replaces new TypeClassProcessor()
+ */

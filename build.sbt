@@ -14,7 +14,9 @@ lazy val root = (project in file("."))
     libraryDependencies += scalaTest   % Test,
     libraryDependencies += mockitoCore % Test,
     libraryDependencies += zio,
-    libraryDependencies += zioStreams
+    libraryDependencies += zioStreams,
+    libraryDependencies += zioHttp,
+    libraryDependencies += zioJson
   )
 
 // See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for instructions on how to publish to Sonatype.

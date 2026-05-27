@@ -1,6 +1,6 @@
 package exercises.tradevalidationpipeline.utils
 
-import exercises.tradevalidationpipeline.model.Trade
+import exercises.tradevalidationpipeline.model.{SymbolMarket, Trade}
 import zio.{ZIO, _}
 
 import java.io.IOException
@@ -8,7 +8,8 @@ import scala.io.{BufferedSource, Source}
 
 object TradeDataUtils {
 
-  val resourceName = "trade_data.txt"
+  val tradeResourceName        = "trade_data.txt"
+  val symbolMarketResourceName = "symbol_market_data.txt"
 
   def openFile(name: String): IO[IOException, BufferedSource] =
     ZIO.attemptBlockingIO(Source.fromResource(name))
@@ -36,5 +37,22 @@ object TradeDataUtils {
     } yield trade
 
     getTrade.toList
+  }
+
+  def getSymbolMarkets(
+      bufferedSourceFile: BufferedSource
+  ): List[SymbolMarket] = {
+
+    def getSymbolMarket: Iterator[SymbolMarket] = for {
+      line <- bufferedSourceFile
+        .getLines()
+        .filter(incomingString => !incomingString.contains("symbol"))
+      list         = line.split(",")
+      symbol       = list.head
+      market       = list(1)
+      symbolMarket = SymbolMarket(symbol, market)
+    } yield symbolMarket
+
+    getSymbolMarket.toList
   }
 }
