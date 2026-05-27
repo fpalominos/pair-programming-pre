@@ -20,15 +20,15 @@ sealed trait ValidatorNec {
   def validatePrice(price: Double): ValidationResult[Double] =
     if (price > 0) price.validNec else InvalidPrice.invalidNec
 
-  def validateSymbol(symbol: Option[String]): ValidationResult[Option[String]] =
-    if (symbol.exists(_.trim.nonEmpty)) symbol.validNec else EmptySymbol.invalidNec
+  def validateSymbol(symbol: String): ValidationResult[String] =
+    if (symbol.nonEmpty) symbol.validNec else EmptySymbol.invalidNec
 
   def validateUIO(trade: Trade): UIO[Either[List[ValidationError], Trade]] = {
     ZIO.succeed {
       val errors = List(
         if (trade.quantity <= 0) None else Some(InvalidQuantity),
         if (trade.price <= 0) None else Some(InvalidPrice),
-        if (trade.symbol.exists(_.trim.nonEmpty)) Some(EmptySymbol) else None
+        if (trade.symbol.trim.nonEmpty) Some(EmptySymbol) else None
       ).flatten
 
       if (errors.isEmpty) Right(trade) else Left(errors)
@@ -37,12 +37,15 @@ sealed trait ValidatorNec {
 
   def validateFromService(trade: Trade, refDataService: RefDataService): ZIO[Any, Nothing, Either[ValidationError, Trade]] = {
     for {
-      validatedTrade <- ZIO.fromEither {
-        for {
-          validatedQuantity <- validateQuantityE(trade)
-          validatedPrice    <- validatePriceE(validatedQuantity)
-        } yield validatedPrice
-      }.mapError(error => error: ValidationError).either
+      validatedTrade <- ZIO
+        .fromEither {
+          for {
+            validatedQuantity <- validateQuantityE(trade)
+            validatedPrice    <- validatePriceE(validatedQuantity)
+          } yield validatedPrice
+        }
+        .mapError(error => error: ValidationError)
+        .either
 
       result <- validatedTrade match {
         case Left(error) =>
@@ -55,16 +58,12 @@ sealed trait ValidatorNec {
   }
 
   private def validateSymbol(trade: Trade, refDataService: RefDataService): ZIO[Any, Nothing, Either[ValidationError, Trade]] = {
-    trade.symbol match {
-      case Some(symbol) =>
-        refDataService
-          .fetchSymbol(symbol)
-          .as(Right(trade))
-          .catchAll(error => ZIO.succeed(Left(ReferenceDataLookupFailed(error.getMessage))))
-
-      case None =>
-        ZIO.succeed(Left(EmptySymbol))
-    }
+    if (trade.symbol.nonEmpty)
+      refDataService
+        .fetchSymbol(trade.symbol)
+        .as(Right(trade))
+        .catchAll(error => ZIO.succeed(Left(ReferenceDataLookupFailed(error.getMessage))))
+    else ZIO.succeed(Left(EmptySymbol))
   }
   private def validateQuantityE(trade: Trade): Either[ValidationError, Trade] = {
     if (trade.quantity > 0) Right(trade) else Left(InvalidQuantity)

@@ -1,6 +1,7 @@
 package exercises.tradevalidationpipeline.validation
 
 import exercises.tradevalidationpipeline.model.{EmptySymbol, InvalidPrice, InvalidQuantity, Trade, ValidationError}
+import exercises.tradevalidationpipeline.validation.ValidatorNecApp.trade
 import zio.{ULayer, ZLayer}
 // sealed trait convenient for mock testing if Validator was dependent on external services
 trait Validator {
@@ -24,7 +25,7 @@ class ValidatorImpl extends Validator {
   def validatePrice(trade: Trade): Either[ValidationError, Trade] =
     if (trade.price > 0) Right(trade) else Left(InvalidPrice)
   def validateSymbol(trade: Trade): Either[ValidationError, Trade] =
-    if (trade.symbol.exists(_.trim.nonEmpty)) Right(trade) else Left(EmptySymbol)
+    if (trade.symbol.trim.nonEmpty) Right(trade) else Left(EmptySymbol)
 }
 
 object Validator {

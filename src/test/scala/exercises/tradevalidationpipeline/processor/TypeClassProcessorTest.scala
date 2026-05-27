@@ -12,7 +12,7 @@ class TypeClassProcessorTest extends AnyFlatSpec with Matchers {
     implicit val mockTradeValidator: ValidatorI[ValidationError, Trade] =
       mock(classOf[ValidatorI[ValidationError, Trade]])
     val typeClassProcessor: TypeClassProcessor = new TypeClassProcessor()
-    val trade1                                 = Trade(id = "1", symbol = Some("s1"), quantity = -3, price = 4)
+    val trade1                                 = Trade(id = "1", symbol = "s1", quantity = -3, price = 4)
     // simulating that validation interacts with an external service, hence mocking
     when(mockTradeValidator.validate(any[Trade])).thenReturn(Left(InvalidQuantity))
     val result: Seq[Either[ValidationError, Trade]] = typeClassProcessor.process(Seq(trade1))

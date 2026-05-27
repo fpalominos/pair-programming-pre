@@ -1,6 +1,7 @@
 package exercises.tradevalidationpipeline.validation.implicitexample
 
 import exercises.tradevalidationpipeline.model.{EmptySymbol, InvalidPrice, InvalidQuantity, Trade, ValidationError}
+import exercises.tradevalidationpipeline.validation.ValidatorNecApp.trade
 
 object TradeValidator {
     implicit val tradeValidator: ValidatorI[ValidationError, Trade] = new ValidatorI[ValidationError, Trade] {
@@ -17,6 +18,6 @@ object TradeValidator {
       def validatePrice(trade: Trade): Either[ValidationError, Trade] =
         if (trade.price > 0) Right(trade) else Left(InvalidPrice)
       def validateSymbol(trade: Trade): Either[ValidationError, Trade] =
-        if (trade.symbol.exists(_.trim.nonEmpty)) Right(trade) else Left(EmptySymbol)
+        if (trade.symbol.trim.nonEmpty) Right(trade) else Left(EmptySymbol)
     }
 }

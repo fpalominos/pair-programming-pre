@@ -33,7 +33,7 @@ object TradeDataUtils {
       symbol   = list(1)
       quantity = list(2)
       price    = list(3)
-      trade    = Trade(id, Option(symbol), quantity.toInt, price.toDouble)
+      trade    = Trade(id, symbol, quantity.toInt, price.toDouble)
     } yield trade
 
     getTrade.toList

@@ -11,7 +11,7 @@ class CumulativeErrorValidatorImpl extends CumulativeErrorValidator {
     val errors: List[ValidationError] = List(
       if (trade.quantity <= 0) Some(InvalidQuantity) else None,
       if (trade.price <= 0) Some(InvalidPrice) else None,
-      if (!trade.symbol.exists(_.trim.nonEmpty)) Some(EmptySymbol) else None
+      if (trade.symbol.trim.nonEmpty) Some(EmptySymbol) else None
     ).flatten
 
     if (errors.isEmpty) Right(trade) else Left(errors)
